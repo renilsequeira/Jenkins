@@ -1,0 +1,41 @@
+pipeline {
+    agent any
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                // Build the Maven project
+                sh 'mvn clean install'
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                // Run tests (if any)
+                sh 'mvn test'
+            }
+        }
+        
+        stage('Run Application') {
+            steps {
+                // Run the Java application
+                sh 'java -cp target/my-java-app-1.0-SNAPSHOT.jar com.example.MyApp'
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo 'Build successful! Deploying...'
+        }
+        failure {
+            echo 'Build failed! Notify the team...'
+        }
+    }
+}
