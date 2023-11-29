@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'maven:3.8.4'  // Use a Maven image with the desired version
+            args '-v $HOME/.m2:/root/.m2'  // Mount Maven repository for caching dependencies
+        }
+    }
     
     stages {
         stage('Checkout') {
@@ -7,35 +12,28 @@ pipeline {
                 checkout scm
             }
         }
-        
+
         stage('Build') {
             steps {
-                // Build the Maven project
                 sh 'mvn clean install'
             }
         }
-        
+
         stage('Test') {
             steps {
-                // Run tests (if any)
                 sh 'mvn test'
             }
         }
-        
-        stage('Run Application') {
-            steps {
-                // Run the Java application
-                sh 'java -cp target/my-java-app-1.0-SNAPSHOT.jar com.example.MyApp'
-            }
-        }
     }
-    
+
     post {
         success {
             echo 'Build successful! Deploying...'
+            // Add deployment steps here if needed
         }
         failure {
             echo 'Build failed! Notify the team...'
+            // Add failure handling steps if needed
         }
     }
 }
